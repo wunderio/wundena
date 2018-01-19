@@ -6,9 +6,25 @@
 # other site definitions.
 default:
 
-  aliases: local
+  # An alias or aliases for the site, this could also be:
+  # aliases:
+  #   - vagrant
+  #   - mylocalbox
+  aliases:
+    - vagrant
+    - local
+
+  # Omit makefile to leave out drush
+  # makefile: conf/site.make
+  type: composer
+
+  # Installation profile to use
+  profile: config_installer
 
   drupal_version: d8
+
+  # Site name given at installation phase
+  site: Wundena
 
   # In development environments we usually want to use symlinks, note the settings.php linking
   link:
@@ -22,130 +38,77 @@ default:
     create:
       - verify: "Type yes to verify you want to create a new installation: "
       - make
-      - shell: composer drupal-scaffold
-      - drush: site-install standard
-      - drush: cex -y
-      - shell: echo "New installation is complete and configuration has been exported. Please commit it."
       - cleanup
 
-    reset:
-      - verify: "Type yes to verify you want to reset your local environment: "
-      - make
-      - drush: site-install config_installer
-      - cleanup
-
-    # Basic site update functionality
     update:
-      - backup:
-         ignore:
-          - builds
       - make
       - drush: updb -y
       - drush: cim -y
-      - drush: entup -y
+      - drush: entity-updates -y
       - cleanup
-      - shell:
-        - vendor/bin/codecept clean -c web/codeception.yml
-        - vendor/bin/codecept run -c web/codeception.yml
 
-    test:
-      - shell:
-        - vendor/bin/codecept clean -c web/codeception.yml
-        - vendor/bin/codecept run -c web/codeception.yml
+    deploy:
+      - shell: 
+        - docker build -f Dockerfile.prod -t images.kontena.io/wunder/wundena:1 .
+        - docker push images.kontena.io/wunder/wundena:1
+        - kontena stack upgrade wundena
 
-# Allow doing minimal builds first in Travis CI
-# These can then be deployed to servers
-ci:
-  aliases: travis
+dev:
 
-  local_commands:
-    build:
-      - make
-      - shell: chmod -R a+w web
-
-# Test environment:
-test:
-
-  aliases: stage
-
-  # Test environment only symlinks files
   link:
-    - files: web/sites/default/files
+    - /drupal_files: web/sites/default/files
 
-
-  # You can use copy to put some custom files in place if needed
-  #copy:
-    #- conf/_ping.php: web/_ping.php
-
-  # We can provide local commands or override global ones.
-  local_commands:
-    create:
-      - shell: echo "Creating a new installation should only be done in local environments."
-
-    reset:
-      - verify: "Type yes to verify you want to reset your local environment: "
-      - backup:
-         ignore:
-          - builds
-      - make
-      - drush: site-install config_installer
-      - cleanup
-
-    # Basic site update functionality
-    build:
-      - make
-
-    update:
-      - drush: updb -y
-      - drush: cim -y
-      - drush: entup -y
-      - cleanup
-      - shell: chmod -R a-w web
-      - shell: sudo systemctl restart nginx php-fpm varnish
-      - shell:
-        - vendor/bin/codecept clean -c web/codeception.yml
-        - vendor/bin/codecept run -c web/codeception.yml --env test
-
-
-# Production environment:
-production:
-
-  aliases: prod
-
-  # Prod environment only symlinks files
-  link:
-    - files: web/sites/default/files
 
   local_commands:
-    create:
-      - shell: echo "Creating a new installation should only be done in local environments."
+    new:
+      - shell: echo "Use the 'create' command to create a new project and the 'reset' command to join an existing one."
 
-    reset:
-      - verify: "Type yes to verify you want to reset your local environment: "
-      - backup:
-         ignore:
-          - builds
+    create:
+      - verify: "Type yes to verify you want to create a new installation: "
       - make
-      - drush: site-install config_installer
       - cleanup
 
-
-    # Basic site update functionality
-    build:
+    backup:
       - backup:
          ignore:
           - builds
           - web/sites/default/files
-      - make
-      #- shell: rsync -az -e ssh web www-admin@[front2_ip]:/var/www/[domain.tld]/
+
+    build:
+      - shell: echo "No build step needed in this environment, just run 'update'."
 
     update:
+      - shell: chmod -R a+w web
+      - make
       - drush: updb -y
       - drush: cim -y
-      - drush: entup -y
+      - drush: entity-updates -y
       - cleanup
-      - shell: chmod -R a-w current
+      - shell: chmod -R a-w web
       - shell: sudo systemctl restart nginx php-fpm varnish
-      #- shell: sudo systemctl -H [front2_ip] restart php-fpm nginx
-      #- shell: sudo systemctl -H [lb_ip] restart varnish
 
+prod:
+
+  link:
+    - /drupal_files: web/sites/default/files
+
+  copy:
+    - conf/prod.settings.php: web/sites/default/settings.local.php
+
+  create:
+    - shell: echo "Creating a new installation should only be done in local environments."
+
+  build:
+    - backup:
+        ignore:
+        - builds
+        - web/sites/default/files
+    - make
+
+  update:
+    - drush: updb -y
+    - drush: cim -y
+    - drush: entity-updates -y
+    - cleanup
+    - shell: chmod -R a-w web
+    - shell: sudo systemctl restart nginx php-fpm varnish
