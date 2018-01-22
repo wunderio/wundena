@@ -29,7 +29,6 @@ default:
   # In development environments we usually want to use symlinks, note the settings.php linking
   link:
     - files: web/sites/default/files
-    - conf/settings.local.php: web/sites/default/settings.local.php
 
   local_commands:
     new:
@@ -40,8 +39,10 @@ default:
       - make
       - cleanup
 
-    update:
+    build:
       - make
+
+    update:
       - drush: updb -y
       - drush: cim -y
       - drush: entity-updates -y
@@ -90,19 +91,13 @@ dev:
 prod:
 
   link:
-    - /drupal_files: web/sites/default/files
+    - files: web/sites/default/files
 
-  copy:
-    - conf/prod.settings.php: web/sites/default/settings.local.php
 
   create:
     - shell: echo "Creating a new installation should only be done in local environments."
 
   build:
-    - backup:
-        ignore:
-        - builds
-        - web/sites/default/files
     - make
 
   update:

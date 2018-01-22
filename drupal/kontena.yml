@@ -31,6 +31,7 @@ services:
         name: SSL_CERT_wundena.dev.wunder.io
   drupal_nginx:
     image: wodby/drupal-nginx:8-1.13-3.0.2
+    instances: 3
     depends_on:
       - drupal
     environment:
@@ -45,6 +46,8 @@ services:
         redirect scheme https code 301 if !{ ssl_fc }
     links:
       - drupal_lb
+    volumes:
+      - drupal_files:/var/www/html/web/sites/default/files
   pma:
     image: phpmyadmin/phpmyadmin
     environment:
@@ -66,7 +69,7 @@ services:
       - drupal_lb
   drupal:
     image: images.kontena.io/wunder/wundena:1
-    instances: 2
+    instances: 3
     environment:
       PHP_FPM_CLEAR_ENV: "no"
       DB_USER_DRUPAL: drupal
@@ -83,11 +86,10 @@ services:
     volumes:
       - drupal_files:/var/www/html/web/sites/default/files
   database:
-    image: mariadb:10.1
+    extends: 
+      file: docker-compose.yml
+      service: mariadb
     stateful: true
-    environment:
-      MYSQL_DATABASE: drupal
-      MYSQL_USER: drupal
     secrets:
       - secret: drupal-mysql-root
         name: MYSQL_ROOT_PASSWORD
