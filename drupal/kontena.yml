@@ -47,7 +47,7 @@ services:
     links:
       - drupal_lb
     volumes_from:
-      - drupal-1
+      - drupal-%s
   pma:
     image: phpmyadmin/phpmyadmin
     environment:
