@@ -46,8 +46,8 @@ services:
         redirect scheme https code 301 if !{ ssl_fc }
     links:
       - drupal_lb
-    volumes:
-      - drupal_files:/var/www/html/web/sites/default/files
+    volumes_from:
+      - drupal-1
   pma:
     image: phpmyadmin/phpmyadmin
     environment:
@@ -82,14 +82,15 @@ services:
       - secret: BASIC_AUTH_WUNDENA
         name: KONTENA_LB_BASIC_AUTH_SECRETS
         type: env
-    stateful: true
     volumes:
       - drupal_files:/var/www/html/web/sites/default/files
+      - /var/www/html/web
   database:
-    extends: 
-      file: docker-compose.yml
-      service: mariadb
+    image: mariadb:10.1
     stateful: true
+    environment:
+      MYSQL_DATABASE: drupal
+      MYSQL_USER: drupal
     secrets:
       - secret: drupal-mysql-root
         name: MYSQL_ROOT_PASSWORD
