@@ -1,22 +1,8 @@
-defaults: &defaults
-  docker:
-    - image: wunderio/circleci-builder
-      environment:
-        - DB_HOST_DRUPAL=localhost
-        - DB_NAME_DRUPAL=drupal
-        - DB_USER_DRUPAL=drupal
-        - DB_PASS_DRUPAL=
-    - image: circleci/mariadb:10
-      environment:
-        - MYSQL_USER=drupal
-        - MYSQL_DATABASE=drupal
-
 version: 2
 jobs:
   build:
-    <<: *defaults
-
-    working_directory: ~/repo
+    docker:
+      - image: wunderio/circleci-builder
 
     steps:
       - checkout
@@ -24,7 +10,8 @@ jobs:
       - run: cd drupal && phpcs --standard=phpcs.xml
 
       - restore_cache:
-          keys: [v1-dependencies-{{ checksum "drupal/composer.lock" }}]
+          keys:
+            - v1-dependencies-{{ checksum "drupal/composer.lock" }}
 
       - run: cd drupal && composer install -n --prefer-dist --ignore-platform-reqs
 
