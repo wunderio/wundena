@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/php:7.1-node-browsers
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mysql:9.4
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys: [v1-global]
+      - run: |
+          composer global require drush/drush-launcher hirak/prestissimo drupal/coder
+          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/drupal/coder/coder_sniffer
+      - save_cache:
+          paths:
+           - ~/.composer/vendor
+          key: v1-global
+
+      - run: cd drupal && ~/.composer/vendor/bin/phpcs --standard=phpcs.xml
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "drupal/composer.json" }}-{{ checksum "drupal/composer.lock" }}
+          - v1-dependencies-{{ checksum "drupal/composer.json" }}
+          - v1-dependencies-
+
+      - run: cd drupal && composer install -n --prefer-dist --ignore-platform-reqs
+
+      - save_cache:
+          paths:
+            - ./drupal/vendor
+          key: v1-dependencies-{{ checksum "drupal/composer.json" }}-{{ checksum "drupal/composer.lock" }}
