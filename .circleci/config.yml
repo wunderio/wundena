@@ -1,6 +1,15 @@
 defaults: &defaults
   docker:
     - image: circleci/php:7.1-node-browsers
+      environment:
+        - DB_HOST_DRUPAL=localhost
+        - DB_NAME_DRUPAL=drupal
+        - DB_USER_DRUPAL=drupal
+        - DB_PASS_DRUPAL=
+    - image: circleci/mariadb:10
+      environment:
+        - MYSQL_USER=drupal
+        - MYSQL_DATABASE=drupal
 
 version: 2
 jobs:
@@ -13,7 +22,6 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mysql:9.4
 
     working_directory: ~/repo
 
@@ -45,3 +53,5 @@ jobs:
           paths:
             - ./drupal/vendor
           key: v1-dependencies-{{ checksum "drupal/composer.json" }}-{{ checksum "drupal/composer.lock" }}
+
+      - run: cd drupal/web && ../vendor/bin/drush status
