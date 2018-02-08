@@ -25,6 +25,17 @@ jobs:
             - ./drupal/web/libraries
           key: v1-dependencies-{{ checksum "drupal/composer.lock" }}
 
+      - restore_cache:
+          keys:
+            - v1-yarn-{{ checksum "drupal/web/themes/custom/fake/yarn.lock" }}
+
+      - run: cd drupal/web/themes/custom/fake && yarn install
+
+      - save_cache:
+          paths:
+            - drupal/web/themes/custom/fake/node_modules
+          key: v1-yarn-{{ checksum "drupal/web/themes/custom/fake/yarn.lock" }}
+
       - setup_remote_docker
 
       # build and push Docker image
