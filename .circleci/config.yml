@@ -1,6 +1,6 @@
 defaults: &defaults
   docker:
-    - image: circleci/php:7.1-node-browsers
+    - image: wunderio/circleci-builder
       environment:
         - DB_HOST_DRUPAL=localhost
         - DB_NAME_DRUPAL=drupal
