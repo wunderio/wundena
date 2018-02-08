@@ -24,16 +24,18 @@ jobs:
       - run: cd drupal && phpcs --standard=phpcs.xml
 
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "drupal/composer.json" }}-{{ checksum "drupal/composer.lock" }}
-          - v1-dependencies-{{ checksum "drupal/composer.json" }}
-          - v1-dependencies-
+          keys: [v1-dependencies-{{ checksum "drupal/composer.lock" }}]
 
       - run: cd drupal && composer install -n --prefer-dist --ignore-platform-reqs
 
       - save_cache:
           paths:
             - ./drupal/vendor
-          key: v1-dependencies-{{ checksum "drupal/composer.json" }}-{{ checksum "drupal/composer.lock" }}
+            - ./drupal/web/core
+            - ./drupal/web/modules/contrib
+            - ./drupal/web/themes/contrib
+            - ./drupal/web/profiles/contrib
+            - ./drupal/web/libraries
+          key: v1-dependencies-{{ checksum "drupal/composer.lock" }}
 
       - run: cd drupal/web && drush status
