@@ -39,9 +39,9 @@ jobs:
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
 
           # Build the images and push them to the repository.
-          kontena stack build --name $STACK_NAME
+          kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
 
           # Deploy the stack
-          kontena stack install --name $STACK_NAME || kontena stack upgrade $STACK_NAME
+          kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
 
 
