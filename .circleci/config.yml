@@ -33,6 +33,28 @@ jobs:
       - run: |
           cd drupal
           TAG=0.1.$CIRCLE_BUILD_NUM
-          docker build -f Dockerfile.prod -t images.kontena.io/wunder/wundena:$TAG .
           docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
-          docker push images.kontena.io/wunder/wundena:$TAG
+
+          # Build the images and push them to the repository.
+          kontena stack build
+
+          # this has to be identical to the value in kontena.yml
+          STACK_VERSION=`awk '/version:/{print $NF}' kontena.yml`
+          STACK_NAME=`awk '/stack:/{print $NF}' kontena.yml`
+
+          # Create the stack if needed
+          if [[ ! $(kontena stack registry show --versions $STACK_NAME) =~ "$STACK_VERSION" ]];
+          then
+            kontena stack registry push kontena.yml;
+          fi
+
+          # Check if the stack is already deployed
+          if [[ ! `kontena stack show $CIRCLE_PROJECT_REPONAME` ]];
+          then
+            # Install the stack
+            kontena stack install --name $CIRCLE_PROJECT_REPONAME $STACK_NAME:$STACK_VERSION
+          else
+            # Or upgrade an existing stack
+            kontena stack upgrade $CIRCLE_PROJECT_REPONAME $STACK_NAME:$STACK_VERSION
+          fi
+
