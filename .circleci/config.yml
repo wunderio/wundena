@@ -35,7 +35,8 @@ jobs:
 
           docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
 
-          STACK_NAME="$CIRCLE_PROJECT_REPONAME-${CIRCLE_BRANCH//\//-}"
+          BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
+          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
 
           # Build the images and push them to the repository.
           kontena stack build --name $STACK_NAME

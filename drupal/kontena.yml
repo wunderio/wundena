@@ -23,7 +23,7 @@ variables:
   branch:
     type: string
     from:
-      env: CIRCLE_BRANCH
+      env: BRANCH_SLUG
   build_number:
     type: string
     from:
