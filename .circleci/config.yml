@@ -38,7 +38,10 @@ jobs:
           # Build the images and push them to the repository.
           kontena stack build
 
-          # this has to be identical to the value in kontena.yml
+      # Push the stack to the registry and deploy it.
+      - run: |
+          cd drupal
+
           STACK_VERSION=`awk '/version:/{print $NF}' kontena.yml`
           STACK_NAME=`awk '/stack:/{print $NF}' kontena.yml`
 
@@ -48,13 +51,15 @@ jobs:
             kontena stack registry push kontena.yml;
           fi
 
+          DEPLOYED_STACK_NAME="$CIRCLE_PROJECT_REPONAME-${CIRCLE_BRANCH//\//-}"
+
           # Check if the stack is already deployed
-          if [[ ! `kontena stack show $CIRCLE_PROJECT_REPONAME` ]];
+          if [[ ! `kontena stack show $DEPLOYED_STACK_NAME` ]];
           then
             # Install the stack
-            kontena stack install --name $CIRCLE_PROJECT_REPONAME $STACK_NAME:$STACK_VERSION
+            kontena stack install --name $DEPLOYED_STACK_NAME $STACK_NAME:$STACK_VERSION
           else
             # Or upgrade an existing stack
-            kontena stack upgrade $CIRCLE_PROJECT_REPONAME $STACK_NAME:$STACK_VERSION
+            kontena stack upgrade $DEPLOYED_STACK_NAME $STACK_NAME:$STACK_VERSION
           fi
 
