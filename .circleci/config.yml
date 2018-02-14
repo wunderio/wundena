@@ -32,34 +32,15 @@ jobs:
       # build and push Docker image
       - run: |
           cd drupal
-          TAG=0.1.$CIRCLE_BUILD_NUM
+
           docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
 
+          STACK_NAME="$CIRCLE_PROJECT_REPONAME-${CIRCLE_BRANCH//\//-}"
+
           # Build the images and push them to the repository.
-          kontena stack build
+          kontena stack build --name $STACK_NAME
 
-      # Push the stack to the registry and deploy it.
-      - run: |
-          cd drupal
+          # Deploy the stack
+          kontena stack install --name $STACK_NAME || kontena stack upgrade $STACK_NAME
 
-          STACK_VERSION=`awk '/version:/{print $NF}' kontena.yml`
-          STACK_NAME=`awk '/stack:/{print $NF}' kontena.yml`
-
-          # Create the stack if needed
-          if [[ ! $(kontena stack registry show --versions $STACK_NAME) =~ "$STACK_VERSION" ]];
-          then
-            kontena stack registry push kontena.yml;
-          fi
-
-          DEPLOYED_STACK_NAME="$CIRCLE_PROJECT_REPONAME-${CIRCLE_BRANCH//\//-}"
-
-          # Check if the stack is already deployed
-          if [[ ! `kontena stack show $DEPLOYED_STACK_NAME` ]];
-          then
-            # Install the stack
-            kontena stack install --name $DEPLOYED_STACK_NAME $STACK_NAME:$STACK_VERSION
-          else
-            # Or upgrade an existing stack
-            kontena stack upgrade $DEPLOYED_STACK_NAME $STACK_NAME:$STACK_VERSION
-          fi
 
