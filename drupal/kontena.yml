@@ -68,6 +68,9 @@ services:
     links:
       - drupal_lb
   drupal:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     image: images.kontena.io/wunder/wundena:1
     instances: 3
     environment:
