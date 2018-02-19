@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: wunderio/circleci-builder
+
+    steps:
+      - checkout
+
+      - run: cd drupal && phpcs --standard=phpcs.xml
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "drupal/composer.lock" }}
+
+      - run: cd drupal && composer install -n --prefer-dist --ignore-platform-reqs
+
+      - save_cache:
+          paths:
+            - ./drupal/vendor
+            - ./drupal/web/core
+            - ./drupal/web/modules/contrib
+            - ./drupal/web/themes/contrib
+            - ./drupal/web/profiles/contrib
+            - ./drupal/web/libraries
+          key: v1-dependencies-{{ checksum "drupal/composer.lock" }}
+
+      - run: cd drupal/web && drush status
+
+      - setup_remote_docker
+
+      # build and push Docker image
+      - run: |
+          cd drupal
+
+          docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
+
+          BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
+          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
+          # Build the images and push them to the repository.
+          kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
+
+          # Deploy the stack
+          kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
+
+

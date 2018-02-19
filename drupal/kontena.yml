@@ -16,6 +16,18 @@ variables:
       random_string: 32
     to:
       vault: drupal-mysql-password
+  project:
+    type: string
+    from:
+      env: CIRCLE_PROJECT_REPONAME
+  branch:
+    type: string
+    from:
+      env: BRANCH_SLUG
+  build_number:
+    type: string
+    from:
+      env: CIRCLE_BUILD_NUM
 
 services:
   drupal_lb:
@@ -39,6 +51,7 @@ services:
       NGINX_ERROR_LOG_LEVEL: debug
       NGINX_BACKEND_HOST: drupal
       NGINX_SERVER_ROOT: /var/www/html/web
+      KONTENA_LB_VIRTUAL_HOSTS: ${branch}.${project}.wundena.dev.wunder.io
       KONTENA_LB_MODE: http
       KONTENA_LB_BALANCE: roundrobin
       KONTENA_LB_INTERNAL_PORT: 80
@@ -71,7 +84,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    image: images.kontena.io/wunder/wundena:1
+    image: "images.kontena.io/wunder/drupal-${project}:${build_number}"
     instances: 3
     environment:
       PHP_FPM_CLEAR_ENV: "no"
