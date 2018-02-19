@@ -41,7 +41,24 @@ jobs:
           # Build the images and push them to the repository.
           kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
 
-          # Deploy the stack
+  deploy:
+    docker:
+      - image: wunderio/circleci-builder
+
+    steps:
+      - run: |
+          BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
+          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
           kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
 
+          kontena service exec $STACK_NAME/drupal drush status --root=/var/www/html/web
 
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
