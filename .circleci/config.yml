@@ -49,6 +49,8 @@ jobs:
       - checkout
 
       - run: |
+          cd drupal
+
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
 
