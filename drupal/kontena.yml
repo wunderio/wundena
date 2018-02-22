@@ -24,10 +24,10 @@ variables:
     type: string
     from:
       env: BRANCH_SLUG
-  build_number:
+  sha1:
     type: string
     from:
-      env: CIRCLE_BUILD_NUM
+      env: CIRCLE_SHA1
 
 services:
   drupal_lb:
@@ -84,7 +84,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    image: "images.kontena.io/wunder/drupal-${project}:${build_number}"
+    image: "images.kontena.io/wunder/drupal-${project}:${CIRCLE_SHA1}"
     instances: 3
     environment:
       PHP_FPM_CLEAR_ENV: "no"
