@@ -84,7 +84,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    image: "images.kontena.io/wunder/drupal-${project}:${CIRCLE_SHA1}"
+    image: "images.kontena.io/wunder/drupal-${project}:${sha1}"
     instances: 3
     environment:
       PHP_FPM_CLEAR_ENV: "no"
