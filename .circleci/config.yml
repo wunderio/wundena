@@ -46,6 +46,8 @@ jobs:
       - image: wunderio/circleci-builder
 
     steps:
+      - checkout
+
       - run: |
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
