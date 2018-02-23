@@ -24,18 +24,6 @@ The project is managed using the following tools:
 * Ticket system: [url2]
 * Project documentation: [googledocsurls]
 
-Hosting info
-------------
-
-The following environments are used in this project:
-
-* Development [dev_url]
-  - servers:
-* Staging [sta_url]
-  - servers:
-* Live site [live_url]
-  - servers:
-
 
 Terminology
 -----------
