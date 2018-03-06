@@ -56,6 +56,19 @@ jobs:
 
           kontena service exec $STACK_NAME/drupal drush status --root=/var/www/html/web
 
+  updb:
+    docker:
+      - image: wunderio/circleci-builder
+
+    steps:
+      - checkout
+
+      - run: |
+          cd drupal
+
+          BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
+          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
           kontena service exec $STACK_NAME/drupal drush updb -y
 
           kontena service exec $STACK_NAME/drupal drush co -y
@@ -68,3 +81,6 @@ workflows:
       - deploy:
           requires:
             - build
+      - updb:
+          requires:
+            - deploy
