@@ -56,6 +56,10 @@ jobs:
 
           kontena service exec $STACK_NAME/drupal drush status --root=/var/www/html/web
 
+          kontena service exec $STACK_NAME/drupal drush updb -y
+
+          kontena service exec $STACK_NAME/drupal drush co -y
+
 workflows:
   version: 2
   commit:
