@@ -33,8 +33,16 @@ jobs:
 
           docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
 
+          JIRA_ID_REGEX='/\d+-[A-Z]+(?!-?[a-zA-Z]{1,10})/g'
+
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
-          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
+	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          then
+	    STACK_NAME="$?-$BRANCH_SLUG"
+          else
+            STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+          fi
 
           # Build the images and push them to the repository.
           kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
@@ -50,7 +58,13 @@ jobs:
           cd drupal
 
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
-          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
+	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          then
+	    STACK_NAME="$?-$BRANCH_SLUG"
+          else
+            STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+          fi
 
           kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
 
@@ -67,7 +81,13 @@ jobs:
           cd drupal
 
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
-          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+
+	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          then
+	    STACK_NAME="$?-$BRANCH_SLUG"
+          else
+            STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
+          fi
 
           kontena service exec $STACK_NAME/drupal drush updb -y
 
