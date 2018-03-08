@@ -37,9 +37,9 @@ jobs:
 
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
 
-	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
           then
-	    STACK_NAME="$?-$BRANCH_SLUG"
+            STACK_NAME="$?-$BRANCH_SLUG"
           else
             STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
           fi
@@ -59,9 +59,9 @@ jobs:
 
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
 
-	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
           then
-	    STACK_NAME="$?-$BRANCH_SLUG"
+            STACK_NAME="$?-$BRANCH_SLUG"
           else
             STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
           fi
@@ -82,9 +82,9 @@ jobs:
 
           BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
 
-	  if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
+          if [ $CIRCLE_PROJECT_REPONAME =~ $JIRA_ID_REGEX ]
           then
-	    STACK_NAME="$?-$BRANCH_SLUG"
+            STACK_NAME="$?-$BRANCH_SLUG"
           else
             STACK_NAME="$CIRCLE_PROJECT_REPONAME-$BRANCH_SLUG"
           fi
@@ -104,5 +104,3 @@ workflows:
       - updb:
           requires:
             - deploy
-
-
