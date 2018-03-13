@@ -35,6 +35,11 @@ variables:
       service_link:
         prompt: Choose a loadbalancer
         image: kontena/lb
+  drupal_docker_image:
+    type: string
+    from:
+      env: DRUPALDOCKERIMAGE
+      prompt: Drupal Docker image (wunder/projectname:version)
 services:
   nginx:
     image: wodby/drupal-nginx:8-1.13-3.0.2
@@ -57,7 +62,7 @@ services:
     volumes_from:
       - drupal-%s
   drupal:
-    image: images.kontena.io/wunder/wundena:1
+    image: images.kontena.io/${drupal_docker_image}
     instances: 2
     environment:
       PHP_FPM_CLEAR_ENV: "no"
