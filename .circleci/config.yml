@@ -46,7 +46,7 @@ jobs:
           export BASICAUTH=""
 
           # Build the images and push them to the repository.
-          kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
+          kontena stack build --name $STACK_NAME
 
   deploy:
     docker:
