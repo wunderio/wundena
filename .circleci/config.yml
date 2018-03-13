@@ -68,6 +68,9 @@ jobs:
           DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:CIRCLE_SHA1"
           LOADBALANCER="loadbalancer/dev_lb"
 
+          # Create the volume for files if needed.
+          kontena volume create --driver local --scope stack "${STACK_NAME}_files" || kontena volume show "${STACK_NAME}_files"
+
           # Create or update the stack for the current branch.
           kontena stack install --name $STACK_NAME || kontena stack upgrade $STACK_NAME
 
