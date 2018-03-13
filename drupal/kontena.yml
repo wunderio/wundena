@@ -64,6 +64,9 @@ services:
       - drupal-%s
   drupal:
     image: images.kontena.io/${drupal_docker_image}
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     instances: 2
     environment:
       PHP_FPM_CLEAR_ENV: "no"
