@@ -60,30 +60,13 @@ jobs:
           STACK_SLUG=${STACK_SLUG:0:15}
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
 
+          # Create or update the stack for the current branch.
           kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
 
-          kontena service exec $STACK_NAME/drupal drush status --root=/var/www/html/web
-
-  updb:
-    docker:
-      - image: wunderio/circleci-builder
-
-    steps:
-      - checkout
-
-      - run: |
-          cd drupal
-
-          BRANCH_SLUG="${CIRCLE_BRANCH//\//-}"
-          STACK_SLUG=${BRANCH_SLUG#'feature-'}
-          STACK_SLUG=${STACK_SLUG#'bug-'}
-          STACK_SLUG=${STACK_SLUG#'hotfix-'}
-          STACK_SLUG=${STACK_SLUG:0:15}
-          STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
-
-          kontena service exec $STACK_NAME/drupal drush updb -y
-
-          kontena service exec $STACK_NAME/drupal drush co -y
+          # Run drush commands within the deployed environment.
+          kontena service exec $STACK_NAME/drupal drush update-db -y --root=/var/www/html/web
+          kontena service exec $STACK_NAME/drupal drush config-import -y --root=/var/www/html/web
+          kontena service exec $STACK_NAME/drupal drush entity-updates -y --root=/var/www/html/web
 
 workflows:
   version: 2
@@ -93,6 +76,3 @@ workflows:
       - deploy:
           requires:
             - build
-      - updb:
-          requires:
-            - deploy
