@@ -40,6 +40,10 @@ jobs:
           STACK_SLUG=${STACK_SLUG:0:15}
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
 
+          VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
+          DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:CIRCLE_SHA1"
+          LOADBALANCER="loadbalancer/dev_lb"
+
           # Build the images and push them to the repository.
           kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
 
@@ -60,8 +64,12 @@ jobs:
           STACK_SLUG=${STACK_SLUG:0:15}
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
 
+          VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
+          DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:CIRCLE_SHA1"
+          LOADBALANCER="loadbalancer/dev_lb"
+
           # Create or update the stack for the current branch.
-          kontena stack install --name $STACK_NAME -v branch=$BRANCH_SLUG || kontena stack upgrade -v branch=$BRANCH_SLUG $STACK_NAME
+          kontena stack install --name $STACK_NAME || kontena stack upgrade $STACK_NAME
 
           # Run drush commands within the deployed environment.
           kontena service exec $STACK_NAME/drupal drush update-db -y --root=/var/www/html/web
