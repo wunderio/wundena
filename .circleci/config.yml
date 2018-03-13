@@ -40,10 +40,10 @@ jobs:
           STACK_SLUG=${STACK_SLUG:0:15}
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
 
-          VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
-          DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:CIRCLE_SHA1"
-          LOADBALANCER="loadbalancer/dev_lb"
-          BASICAUTH=""
+          export VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
+          export DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}"
+          export LOADBALANCER="loadbalancer/dev_lb"
+          export BASICAUTH=""
 
           # Build the images and push them to the repository.
           kontena stack build --name $STACK_NAME -v branch=$BRANCH_SLUG
@@ -65,10 +65,10 @@ jobs:
           STACK_SLUG=${STACK_SLUG:0:15}
           STACK_NAME="$CIRCLE_PROJECT_REPONAME-$STACK_SLUG"
 
-          VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
-          DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:CIRCLE_SHA1"
-          LOADBALANCER="loadbalancer/dev_lb"
-          BASICAUTH=""
+          export VIRTUALHOST="${BRANCH_SLUG}.${CIRCLE_PROJECT_REPONAME}.dev.wdr.io"
+          export DRUPALDOCKERIMAGE="wunder/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}"
+          export LOADBALANCER="loadbalancer/dev_lb"
+          export BASICAUTH=""
 
           # Create the volume for files if needed.
           kontena volume create --driver local --scope stack "${STACK_NAME}_files" || kontena volume show "${STACK_NAME}_files"
