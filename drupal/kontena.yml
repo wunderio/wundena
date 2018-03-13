@@ -19,6 +19,7 @@ variables:
     type: string
     from:
       vault: ${STACK}_basic_auth
+      env: BASICAUTH
       prompt: Basicauth credentials (user [username] insecure-password [password])
     to:
       vault: ${STACK}_basic_auth
