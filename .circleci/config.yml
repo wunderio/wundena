@@ -85,7 +85,9 @@ workflows:
   version: 2
   commit:
     jobs:
-      - build
+      - build:
+          context: dev_wdr_io
       - deploy:
           requires:
             - build
+          context: dev_wdr_io
