@@ -27,14 +27,14 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-yarn-{{ checksum "drupal/web/themes/custom/fake/yarn.lock" }}
+            - v1-yarn-{{ checksum "drupal/yarn.lock" }}
 
-      - run: cd drupal/web/themes/custom/fake && yarn install
+      - run: cd drupal && yarn install
 
       - save_cache:
           paths:
-            - drupal/web/themes/custom/fake/node_modules
-          key: v1-yarn-{{ checksum "drupal/web/themes/custom/fake/yarn.lock" }}
+            - drupal/node_modules
+          key: v1-yarn-{{ checksum "drupal/yarn.lock" }}
 
       - setup_remote_docker
 
